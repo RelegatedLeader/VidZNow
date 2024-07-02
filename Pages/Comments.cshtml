@@ -1,0 +1,25 @@
+﻿@page
+@model VidZNow.Pages.CommentsModel
+@{
+    ViewData["Title"] = "Comments";
+}
+
+<h1>Comments for @Model.Video.Title</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="comment">Add Comment</label>
+        <textarea class="form-control" id="comment" name="Comment" asp-for="NewComment.Content"></textarea>
+        <span asp-validation-for="NewComment.Content" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@foreach (var comment in Model.Comments)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">@comment.Content</p>
+        </div>
+    </div>
+}

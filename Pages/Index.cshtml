@@ -1,0 +1,66 @@
+﻿@page
+@model VidZNow.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h1>Recent Videos</h1>
+
+@foreach (var video in Model.RecentVideos)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@video.Title</h5>
+            <p class="card-text">@video.Description</p>
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="@GetEmbeddedYouTubeUrl(video.Url)" allowfullscreen></iframe>
+            </div>
+            <p class="text-muted">Comments: @video.CommentsCount</p>
+            <p class="text-muted">Likes: @video.LikesCount</p>
+            <form method="post" asp-page-handler="Like" asp-route-videoId="@video.Id">
+                <button type="submit" class="btn btn-primary">Like</button>
+            </form>
+            <button class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#comments-@video.Id">View/Add Comments</button>
+            <div id="comments-@video.Id" class="collapse mt-2">
+                <h5>Top Comments</h5>
+                @foreach (var comment in video.TopComments)
+                {
+                    <div class="mb-2">
+                        <p><strong>@comment.User.UserName:</strong> @comment.Content</p>
+                        <p>Likes: @comment.Likes.Count</p>
+                    </div>
+                }
+                <h5>All Comments</h5>
+                @foreach (var comment in video.Comments)
+                {
+                    <div class="mb-2">
+                        <p><strong>@comment.User.UserName:</strong> @comment.Content</p>
+                    </div>
+                }
+                <form method="post" asp-page-handler="Comment" asp-route-videoId="@video.Id">
+                    <div class="form-group">
+                        <textarea name="content" class="form-control" placeholder="Add a comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    string GetEmbeddedYouTubeUrl(string youtubeUrl)
+    {
+        try
+        {
+            var uri = new Uri(youtubeUrl);
+            var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var videoId = queryParams["v"];
+            return $"https://www.youtube.com/embed/{videoId}";
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+}
